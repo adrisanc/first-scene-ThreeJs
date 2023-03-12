@@ -70,11 +70,48 @@ scene.add(axesHelper);
 mesh.position.normalize();
 // console.log(mesh.position.length());
 
-//Camera
+//Sizes
 const sizes = {
-  width: 800,
-  height: 600,
+  width: window.innerWidth,
+  height: window.innerHeight,
 };
+
+window.addEventListener('resize', () => {
+    //Update sizes
+    sizes.width = window.innerWidth
+    sizes.height = window.innerHeight
+    camera.updateProjectionMatrix()
+
+    // Update Camera
+    camera.aspect=sizes.width / sizes.height
+    
+    //UpdateRendere 
+    renderer.setSize(sizes.width, sizes.height);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+
+});
+
+window.addEventListener('dblclick', () => {
+
+    const fullscreenElement = document.fullscreenElement || document.webkitFullscreenElement
+
+    if(!fullscreenElement) {
+        if (canvas.requestFullscreen) {
+            
+            canvas.requestFullscreen()
+        } else if(canvas.webkitRequestFullscreen){
+            canvas.webkitRequestFullscreen()
+        }
+
+    }else{
+        if ( document.exitFullscreen) {
+            document.exitFullscreen()
+        } else if(document.webkitExitFullscreen){
+            document.webkitExitFullscreen()
+        }
+    }
+
+})
 
 //perspective Camera
 const camera = new THREE.PerspectiveCamera(71, sizes.width / sizes.height,0.1,100);
@@ -82,7 +119,6 @@ const camera = new THREE.PerspectiveCamera(71, sizes.width / sizes.height,0.1,10
 // Ortagraphic Camera
 // (left,rigth,top,bottom)
 // const aspectRatio = sizes.width / sizes.height;
-// console.log(aspectRatio);
 // const camera = new THREE.OrthographicCamera(-1 * aspectRatio, 1 * aspectRatio,1,-1,0.1,100)
 scene.add(camera);
 
@@ -93,7 +129,6 @@ camera.position.z = 3; //it would be y in blender(depth)
 
 // Set camera to focus on mesh
 // camera.lookAt(mesh.position)
-
 
 //rendering mesh
 const canvas = document.querySelector(".webGL");
@@ -108,6 +143,7 @@ controls.enableDamping = true;
 // controls.target.y = 1;
 
 renderer.setSize(sizes.width, sizes.height);
+renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
 
 // let time = Date.now()
@@ -117,6 +153,7 @@ const clock = new THREE.Clock();
 
 // gsap.to(mesh.position,{duration: 1, delay:1, x:2})
 // gsap.to(mesh.position,{duration: 1, delay:2, x:0})
+
 //Animations
 const tick = () => {
 
