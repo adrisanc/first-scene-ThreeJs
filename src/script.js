@@ -2,7 +2,18 @@ import "./styles.css";
 //Scene
 import * as THREE from "three";
 import gsap from 'gsap';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
+// Cursor 
+const cursor = {
+    x:0,
+    y:0
+}
+window.addEventListener('mousemove', (e) => {
+    cursor.x = e.clientX / sizes.width - 0.5;
+    cursor.y = - (e.clientY / sizes.height - 0.5);
+
+})
 
 const scene = new THREE.Scene();
 
@@ -14,7 +25,7 @@ const mesh = new THREE.Mesh(geometry, material);
 // mesh.position.x = 3
 // mesh.position.y = -3
 // mesh.position.z = -1
-mesh.position.set(2, 0, -3);
+mesh.position.set(0, 0, -3);
 
 // Scale mesh
 mesh.scale.set(2, 0.5, 1);
@@ -34,7 +45,7 @@ const cube1 = new THREE.Mesh(
   new THREE.BoxGeometry(1, 2, 3),
   new THREE.MeshBasicMaterial({ color: 0x00ff00 })
 );
-cube1.position.set(2, 1, -3);
+cube1.position.set(0.8, 1, -3);
 group.add(cube1);
 
 const cube2 = new THREE.Mesh(
@@ -50,7 +61,7 @@ const cube3 = new THREE.Mesh(
 );
 cube3.position.set(4, 3, -3);
 group.add(cube3);
-group.position.set(1, -2, -1);
+group.position.set(1, -2, 1);
 
 // Axes Helper
 const axesHelper = new THREE.AxesHelper(3);
@@ -65,22 +76,37 @@ const sizes = {
   height: 600,
 };
 
-const camera = new THREE.PerspectiveCamera(75, sizes.width / sizes.height);
+//perspective Camera
+const camera = new THREE.PerspectiveCamera(71, sizes.width / sizes.height,0.1,100);
+
+// Ortagraphic Camera
+// (left,rigth,top,bottom)
+// const aspectRatio = sizes.width / sizes.height;
+// console.log(aspectRatio);
+// const camera = new THREE.OrthographicCamera(-1 * aspectRatio, 1 * aspectRatio,1,-1,0.1,100)
 scene.add(camera);
 
 //Setting camera position
+// camera.position.x = 3; //same as blender(horizontal)
+// camera.position.y = 3; //it would be z in blender(vertical)
 camera.position.z = 3; //it would be y in blender(depth)
-camera.position.x = 1; //same as blender(horizontal)
-camera.position.y = 1; //it would be z in blender(vertical)
 
 // Set camera to focus on mesh
 // camera.lookAt(mesh.position)
 
+
 //rendering mesh
 const canvas = document.querySelector(".webGL");
 const renderer = new THREE.WebGLRenderer({
-  canvas: canvas,
+    canvas: canvas,
 });
+
+//Controls
+const controls = new OrbitControls(camera,canvas);
+controls.enableDamping = true;
+// controls.update()
+// controls.target.y = 1;
+
 renderer.setSize(sizes.width, sizes.height);
 
 
@@ -89,8 +115,8 @@ renderer.setSize(sizes.width, sizes.height);
 //Clock 
 const clock = new THREE.Clock();
 
-gsap.to(mesh.position,{duration: 1, delay:1, x:2})
-gsap.to(mesh.position,{duration: 1, delay:2, x:0})
+// gsap.to(mesh.position,{duration: 1, delay:1, x:2})
+// gsap.to(mesh.position,{duration: 1, delay:2, x:0})
 //Animations
 const tick = () => {
 
@@ -106,8 +132,18 @@ const tick = () => {
     const elapsedTime = clock.getElapsedTime();
     //Update objects with clock class
     // mesh.rotation.y = elapsedTime
-    group.position.y = Math.sin(elapsedTime);
+    // group.position.y = Math.sin(elapsedTime);
     // mesh.position.x = Math.cos(elapsedTime)
+
+    //Update Camera
+    // camera.position.x = Math.sin(cursor.x * Math.PI * 2) * 5;
+    // camera.position.z = Math.cos(cursor.x * Math.PI * 2) * 5 ;
+    // camera.position.y = cursor.y * 10 ;
+    // camera.lookAt(mesh.position);
+
+    //Update Controls smmoth movemment with controls.enableDamping = true;
+    controls.update();
+
 
     renderer.render(scene, camera);
     window.requestAnimationFrame(tick)
