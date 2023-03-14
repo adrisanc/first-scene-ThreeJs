@@ -16,10 +16,30 @@ window.addEventListener('mousemove', (e) => {
 })
 
 const scene = new THREE.Scene();
-
 //Mesh
-const geometry = new THREE.BoxGeometry(1, 1, 1);
-const material = new THREE.MeshBasicMaterial({ color: "#ff0000" });
+// const geometry = new THREE.BoxBufferGeometry(1, 1, 1, 2, 2, 2);
+// const geometry = new THREE.Geometry()
+
+
+const geometry = new THREE.BufferGeometry();
+const count = 50;
+const positionsArray = new Float32Array( count * 3 * 3)
+
+for(let i = 0; i< count * 3 * 3; i++){
+    positionsArray[i] = (Math.random() - 0.5) * 2
+}
+
+const positionAttribute = new THREE.BufferAttribute(positionsArray,3)
+
+//it's important to set the attribute with the name position
+geometry.setAttribute('position', positionAttribute)
+
+const material = new THREE.MeshBasicMaterial({ 
+    color: "#ff0000" ,
+    wireframe: true
+});
+
+
 const mesh = new THREE.Mesh(geometry, material);
 //Position mesh
 // mesh.position.x = 3
@@ -28,7 +48,7 @@ const mesh = new THREE.Mesh(geometry, material);
 mesh.position.set(0, 0, -3);
 
 // Scale mesh
-mesh.scale.set(2, 0.5, 1);
+// mesh.scale.set(2, 0, 1);
 
 //Rotate Mesh
 mesh.rotation.reorder("YXZ");
