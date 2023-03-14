@@ -1,44 +1,52 @@
 import "./styles.css";
 //Scene
 import * as THREE from "three";
-import gsap from 'gsap';
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import gsap from "gsap";
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import * as dat from "dat.gui";
+import { log } from "three";
 
-// Cursor 
-const cursor = {
-    x:0,
-    y:0
+//Debug iniziliazing
+const gui = new dat.GUI();
+// gui.hide()
+gui.close()
+gui.width = 400
+
+const parameters = {
+    color: 0xff0000,
+    spin: () => {
+        gsap.to(mesh.rotation,{duration:1 , y: mesh.rotation.y + 10})
+
+    }
 }
-window.addEventListener('mousemove', (e) => {
-    cursor.x = e.clientX / sizes.width - 0.5;
-    cursor.y = - (e.clientY / sizes.height - 0.5);
 
+//debug mesh ui color
+gui.addColor(parameters,'color').onChange(()=> {
+    material.color.set(parameters.color)
 })
+
+//Devug add functions
+
+gui.add(parameters,'spin')
+
+// Cursor
+const cursor = {
+  x: 0,
+  y: 0,
+};
+window.addEventListener("mousemove", (e) => {
+  cursor.x = e.clientX / sizes.width - 0.5;
+  cursor.y = -(e.clientY / sizes.height - 0.5);
+});
 
 const scene = new THREE.Scene();
 //Mesh
-// const geometry = new THREE.BoxBufferGeometry(1, 1, 1, 2, 2, 2);
+const geometry = new THREE.BoxBufferGeometry(1, 1, 1, 2, 2, 2);
 // const geometry = new THREE.Geometry()
 
-
-const geometry = new THREE.BufferGeometry();
-const count = 50;
-const positionsArray = new Float32Array( count * 3 * 3)
-
-for(let i = 0; i< count * 3 * 3; i++){
-    positionsArray[i] = (Math.random() - 0.5) * 2
-}
-
-const positionAttribute = new THREE.BufferAttribute(positionsArray,3)
-
-//it's important to set the attribute with the name position
-geometry.setAttribute('position', positionAttribute)
-
-const material = new THREE.MeshBasicMaterial({ 
-    color: "#ff0000" ,
-    wireframe: true
+const material = new THREE.MeshBasicMaterial({
+  color: parameters.color,
 });
-
 
 const mesh = new THREE.Mesh(geometry, material);
 //Position mesh
@@ -46,6 +54,19 @@ const mesh = new THREE.Mesh(geometry, material);
 // mesh.position.y = -3
 // mesh.position.z = -1
 mesh.position.set(0, 0, -3);
+mesh.visible = true;
+
+//Debug mesh ui position
+gui.add(mesh.position, "x").min(-3).max(3).step(0.01).name('Red cube X');
+gui.add(mesh.position, "y", -3, 3, 0.01).name('Red cube Y');
+gui.add(mesh.position, "z", -3, 3, 0.01).name('Red cube Z');
+
+//Debug mesh ui visible
+gui.add(mesh, 'visible')
+
+// debug mesh wireframe
+gui.add(material, 'wireframe')
+
 
 // Scale mesh
 // mesh.scale.set(2, 0, 1);
@@ -62,21 +83,21 @@ scene.add(group);
 
 //Meshes to add to the group
 const cube1 = new THREE.Mesh(
-  new THREE.BoxGeometry(1, 2, 3),
+  new THREE.BoxGeometry(2, 2, 2),
   new THREE.MeshBasicMaterial({ color: 0x00ff00 })
 );
 cube1.position.set(0.8, 1, -3);
 group.add(cube1);
 
 const cube2 = new THREE.Mesh(
-  new THREE.BoxGeometry(1, 1, 3),
+  new THREE.BoxGeometry(1, 1, 1),
   new THREE.MeshBasicMaterial({ color: 0x0000ff })
 );
 cube2.position.set(3.5, 2, -3);
 group.add(cube2);
 
 const cube3 = new THREE.Mesh(
-  new THREE.BoxGeometry(1, 1, 3),
+  new THREE.BoxGeometry(1, 1, 1),
   new THREE.MeshBasicMaterial({ color: 0x00d377 })
 );
 cube3.position.set(4, 3, -3);
@@ -96,45 +117,46 @@ const sizes = {
   height: window.innerHeight,
 };
 
-window.addEventListener('resize', () => {
-    //Update sizes
-    sizes.width = window.innerWidth
-    sizes.height = window.innerHeight
-    camera.updateProjectionMatrix()
+window.addEventListener("resize", () => {
+  //Update sizes
+  sizes.width = window.innerWidth;
+  sizes.height = window.innerHeight;
+  camera.updateProjectionMatrix();
 
-    // Update Camera
-    camera.aspect=sizes.width / sizes.height
-    
-    //UpdateRendere 
-    renderer.setSize(sizes.width, sizes.height);
-    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  // Update Camera
+  camera.aspect = sizes.width / sizes.height;
 
+  //UpdateRendere
+  renderer.setSize(sizes.width, sizes.height);
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
-window.addEventListener('dblclick', () => {
+// window.addEventListener("dblclick", () => {
+//   const fullscreenElement =
+//     document.fullscreenElement || document.webkitFullscreenElement;
 
-    const fullscreenElement = document.fullscreenElement || document.webkitFullscreenElement
-
-    if(!fullscreenElement) {
-        if (canvas.requestFullscreen) {
-            
-            canvas.requestFullscreen()
-        } else if(canvas.webkitRequestFullscreen){
-            canvas.webkitRequestFullscreen()
-        }
-
-    }else{
-        if ( document.exitFullscreen) {
-            document.exitFullscreen()
-        } else if(document.webkitExitFullscreen){
-            document.webkitExitFullscreen()
-        }
-    }
-
-})
+//   if (!fullscreenElement) {
+//     if (canvas.requestFullscreen) {
+//       canvas.requestFullscreen();
+//     } else if (canvas.webkitRequestFullscreen) {
+//       canvas.webkitRequestFullscreen();
+//     }
+//   } else {
+//     if (document.exitFullscreen) {
+//       document.exitFullscreen();
+//     } else if (document.webkitExitFullscreen) {
+//       document.webkitExitFullscreen();
+//     }
+//   }
+// });
 
 //perspective Camera
-const camera = new THREE.PerspectiveCamera(71, sizes.width / sizes.height,0.1,100);
+const camera = new THREE.PerspectiveCamera(
+  71,
+  sizes.width / sizes.height,
+  0.1,
+  100
+);
 
 // Ortagraphic Camera
 // (left,rigth,top,bottom)
@@ -153,11 +175,11 @@ camera.position.z = 3; //it would be y in blender(depth)
 //rendering mesh
 const canvas = document.querySelector(".webGL");
 const renderer = new THREE.WebGLRenderer({
-    canvas: canvas,
+  canvas: canvas,
 });
 
 //Controls
-const controls = new OrbitControls(camera,canvas);
+const controls = new OrbitControls(camera, canvas);
 controls.enableDamping = true;
 // controls.update()
 // controls.target.y = 1;
@@ -165,10 +187,9 @@ controls.enableDamping = true;
 renderer.setSize(sizes.width, sizes.height);
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-
 // let time = Date.now()
 
-//Clock 
+//Clock
 const clock = new THREE.Clock();
 
 // gsap.to(mesh.position,{duration: 1, delay:1, x:2})
@@ -176,33 +197,31 @@ const clock = new THREE.Clock();
 
 //Animations
 const tick = () => {
+  //Time
+  // const currentTime = Date.now();
+  // const deltaTime = currentTime - time;
+  // time = currentTime;
 
-    //Time 
-    // const currentTime = Date.now();
-    // const deltaTime = currentTime - time;
-    // time = currentTime;
+  // Update objects by Time
+  // mesh.rotation.y += 0.001 * deltaTime
 
-    // Update objects by Time 
-    // mesh.rotation.y += 0.001 * deltaTime
+  //Clock
+  const elapsedTime = clock.getElapsedTime();
+  //Update objects with clock class
+  // mesh.rotation.y = elapsedTime
+  // group.position.y = Math.sin(elapsedTime);
+  // mesh.position.x = Math.cos(elapsedTime)
 
-    //Clock 
-    const elapsedTime = clock.getElapsedTime();
-    //Update objects with clock class
-    // mesh.rotation.y = elapsedTime
-    // group.position.y = Math.sin(elapsedTime);
-    // mesh.position.x = Math.cos(elapsedTime)
+  //Update Camera
+  // camera.position.x = Math.sin(cursor.x * Math.PI * 2) * 5;
+  // camera.position.z = Math.cos(cursor.x * Math.PI * 2) * 5 ;
+  // camera.position.y = cursor.y * 10 ;
+  // camera.lookAt(mesh.position);
 
-    //Update Camera
-    // camera.position.x = Math.sin(cursor.x * Math.PI * 2) * 5;
-    // camera.position.z = Math.cos(cursor.x * Math.PI * 2) * 5 ;
-    // camera.position.y = cursor.y * 10 ;
-    // camera.lookAt(mesh.position);
+  //Update Controls smmoth movemment with controls.enableDamping = true;
+  controls.update();
 
-    //Update Controls smmoth movemment with controls.enableDamping = true;
-    controls.update();
-
-
-    renderer.render(scene, camera);
-    window.requestAnimationFrame(tick)
+  renderer.render(scene, camera);
+  window.requestAnimationFrame(tick);
 };
-tick()
+tick();
