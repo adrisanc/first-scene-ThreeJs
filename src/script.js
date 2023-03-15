@@ -6,6 +6,68 @@ import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import * as dat from "dat.gui";
 import { log } from "three";
 
+
+//Textures with Pure Js
+const image = new Image()
+const texture = new THREE.Texture(image);
+
+image.onload = () => {
+    console.log('image loaded');
+    //its important to aply image loaded
+    texture.needsUpdate = true
+}
+
+image.src = '/textures/door/color.jpg'
+
+// Texture with Texture Loader to cube 1, with one textureload can load multiple textures
+const loadingManager = new THREE.LoadingManager();
+
+loadingManager.onStart = () => {
+    console.log('onStart');
+}
+
+loadingManager.onLoad = () => {
+    console.log('onLoad');
+}
+
+loadingManager.onError = () => {
+    console.log('onError');
+}
+
+loadingManager.onProgress = () => {
+    console.log('onProgress');
+}
+
+
+const textureLoader = new THREE.TextureLoader(loadingManager)
+const colorTextureCube1 = textureLoader.load('/textures/door/color.jpg');
+const alphaTextureCube1 = textureLoader.load('/textures/door/alpha.jpg');
+const heightTextureCube1 = textureLoader.load('/textures/door/height.jpg');
+const nomarlTextureCube1 = textureLoader.load('/textures/door/normal.jpg');
+const ambientOclussionTextureCube1 = textureLoader.load('/textures/door/ambientOcclusion.jpg');
+const roughnessTextureCube1 = textureLoader.load('/textures/door/roughness.jpg')
+
+// colorTextureCube1.repeat.x = 2 
+// colorTextureCube1.repeat.y = 3
+// colorTextureCube1.wrapS = THREE.MirroredRepeatWrapping // wrapS horizontal
+// colorTextureCube1.wrapT = THREE.MirroredRepeatWrapping //wrapT Vertical
+
+// colorTextureCube1.offset.x = 0.5
+// colorTextureCube1.offset.y = 0.5
+// colorTextureCube1.rotation = Math.PI / 4
+// colorTextureCube1.center.x = 0.5
+// colorTextureCube1.center.y = 0.5
+
+colorTextureCube1.generateMipmaps = false
+colorTextureCube1.minFilter = THREE.NearestFilter
+colorTextureCube1.magFilter = THREE.NearestFilter
+
+
+
+
+
+
+
 //Debug iniziliazing
 const gui = new dat.GUI();
 // gui.hide()
@@ -13,7 +75,7 @@ gui.close()
 gui.width = 400
 
 const parameters = {
-    color: 0xff0000,
+    color: 0xffffff,
     spin: () => {
         gsap.to(mesh.rotation,{duration:1 , y: mesh.rotation.y + 10})
 
@@ -45,7 +107,8 @@ const geometry = new THREE.BoxBufferGeometry(1, 1, 1, 2, 2, 2);
 // const geometry = new THREE.Geometry()
 
 const material = new THREE.MeshBasicMaterial({
-  color: parameters.color,
+    color: parameters.color,
+  map: texture,
 });
 
 const mesh = new THREE.Mesh(geometry, material);
@@ -84,7 +147,7 @@ scene.add(group);
 //Meshes to add to the group
 const cube1 = new THREE.Mesh(
   new THREE.BoxGeometry(2, 2, 2),
-  new THREE.MeshBasicMaterial({ color: 0x00ff00 })
+  new THREE.MeshBasicMaterial({ map:colorTextureCube1 })
 );
 cube1.position.set(0.8, 1, -3);
 group.add(cube1);
