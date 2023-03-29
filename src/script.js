@@ -7,230 +7,164 @@ import * as dat from "dat.gui";
 import { log } from "three";
 
 
-//Textures with Pure Js
-const image = new Image()
-const texture = new THREE.Texture(image);
+//Textures
+const textureLoader = new THREE.TextureLoader();
 
-image.onload = () => {
-    //its important to aply image loaded
-    texture.needsUpdate = true
-}
-
-image.src = '/textures/door/color.jpg'
-
-// Texture with Texture Loader to cube 1, with one textureload can load multiple textures
-const loadingManager = new THREE.LoadingManager();
-
-loadingManager.onStart = () => {
-    console.log('onStart');
-}
-
-loadingManager.onLoad = () => {
-    console.log('onLoad');
-}
-
-loadingManager.onError = () => {
-    console.log('onError');
-}
-
-loadingManager.onProgress = () => {
-    console.log('onProgress');
-}
+const doorColorTexture = textureLoader.load('/textures/door/color.jpg');
+const doorAlphaTexture = textureLoader.load('/textures/door/alpha.jpg');
+const doorNormalTexture = textureLoader.load('/textures/door/normal.jpg');
+const doorMetalnessTexture = textureLoader.load('/textures/door/metalness.jpg');
+const doorAmbientOcclusionTexture = textureLoader.load('/textures/door/ambientOcclusion.jpg');
+const doorRoughnessTexture = textureLoader.load('/textures/door/roughness.jpg');
+const matCapTexture = textureLoader.load('/textures/matcaps/7.png');
+const gradientTexture = textureLoader.load('/textures/gradients/3.jpg')
 
 
-const textureLoader = new THREE.TextureLoader(loadingManager)
-const colorTextureCube1 = textureLoader.load('/textures/door/color.jpg');
-const alphaTextureCube1 = textureLoader.load('/textures/door/alpha.jpg');
-const heightTextureCube1 = textureLoader.load('/textures/door/height.jpg');
-const nomarlTextureCube1 = textureLoader.load('/textures/door/normal.jpg');
-const ambientOclussionTextureCube1 = textureLoader.load('/textures/door/ambientOcclusion.jpg');
-const roughnessTextureCube1 = textureLoader.load('/textures/door/roughness.jpg')
-
-colorTextureCube1.generateMipmaps = false
-
-//minFilter doens't need genereateMipMaps
-colorTextureCube1.minFilter = THREE.NearestFilter
-
-//to avoid blur textures
-colorTextureCube1.magFilter = THREE.NearestFilter
-
-//Debug iniziliazing
-const gui = new dat.GUI();
-// gui.hide()
-gui.close()
-gui.width = 400
-
-const parameters = {
-    color: 0xffffff,
-    spin: () => {
-        gsap.to(mesh.rotation,{duration:1 , y: mesh.rotation.y + 10})
-
-    }
-}
-
-//debug mesh ui color
-gui.addColor(parameters,'color').onChange(()=> {
-    material.color.set(parameters.color)
-})
-
-//Devug add functions
-
-gui.add(parameters,'spin')
-
-// Cursor
-const cursor = {
-  x: 0,
-  y: 0,
-};
-window.addEventListener("mousemove", (e) => {
-  cursor.x = e.clientX / sizes.width - 0.5;
-  cursor.y = -(e.clientY / sizes.height - 0.5);
-});
-
+//scene
 const scene = new THREE.Scene();
-
-//Mesh
-const geometry = new THREE.BoxBufferGeometry(1, 1, 1, 2, 2, 2);
-// const geometry = new THREE.Geometry()
-
-const material = new THREE.MeshBasicMaterial({
-  color: parameters.color,
-  map: texture,
-});
-
-const mesh = new THREE.Mesh(geometry, material);
-//Position mesh
-// mesh.position.x = 3
-// mesh.position.y = -3
-// mesh.position.z = -1
-mesh.position.set(0, 0, -3);
-mesh.visible = true;
-
-//Debug mesh ui position
-gui.add(mesh.position, "x").min(-3).max(3).step(0.01).name('Red cube X');
-gui.add(mesh.position, "y", -3, 3, 0.01).name('Red cube Y');
-gui.add(mesh.position, "z", -3, 3, 0.01).name('Red cube Z');
-
-//Debug mesh ui visible
-gui.add(mesh, 'visible')
-
-// debug mesh wireframe
-gui.add(material, 'wireframe')
-
-
-// Scale mesh
-// mesh.scale.set(2, 0, 1);
-
-//Rotate Mesh
-mesh.rotation.reorder("YXZ");
-mesh.rotation.y = Math.PI / 2;
-mesh.rotation.x = Math.PI / 2;
-scene.add(mesh);
-
-//Create a Group
-const group = new THREE.Group();
-scene.add(group);
-
-//Meshes to add to the group
-const cube1 = new THREE.Mesh(
-  new THREE.BoxGeometry(2, 2, 2),
-  new THREE.MeshBasicMaterial({ map:colorTextureCube1 })
-);
-cube1.position.set(0.8, 1, -3);
-group.add(cube1);
-
-const cube2 = new THREE.Mesh(
-  new THREE.BoxGeometry(1, 1, 1),
-  new THREE.MeshBasicMaterial({ color: 0x0000ff })
-);
-cube2.position.set(3.5, 2, -3);
-group.add(cube2);
-
-const cube3 = new THREE.Mesh(
-  new THREE.BoxGeometry(1, 1, 1),
-  new THREE.MeshBasicMaterial({ color: 0x00d377 })
-);
-cube3.position.set(4, 3, -3);
-group.add(cube3);
-group.position.set(1, -2, 1);
-
-// Axes Helper
-const axesHelper = new THREE.AxesHelper(3);
-
-scene.add(axesHelper);
-mesh.position.normalize();
-// console.log(mesh.position.length());
 
 //Sizes
 const sizes = {
-  width: window.innerWidth,
-  height: window.innerHeight,
+  with: window.innerWidth,
+  height: window.innerHeight
 };
 
-window.addEventListener("resize", () => {
-  //Update sizes
-  sizes.width = window.innerWidth;
-  sizes.height = window.innerHeight;
-  camera.updateProjectionMatrix();
+//Objects
+const material = new THREE.MeshBasicMaterial();
 
-  // Update Camera
-  camera.aspect = sizes.width / sizes.height;
+// material.wireframe = true;
+// material.opacity = 0.5;
+// material.transparent = true;
+material.map = doorColorTexture;
+// material.alphaMap = doorAlphaTexture;
+// material.side = THREE.BackSide;
 
-  //UpdateRendere
-  renderer.setSize(sizes.width, sizes.height);
-  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
-});
+/*//?other ways to set color on material
+  material.color.set('#ff00ff');  
+  material.color = new THREE.Color('#3303aa')*/
+
+  //?Normal Material
+  // const normalMaterial =  new THREE.MeshNormalMaterial();
+  // normalMaterial.bumpMap = doorNormalTexture;
+  // normalMaterial.flatShading = true
+
+  //?MeshMatCapMaterial
+  const matCapMaterial = new THREE.MeshMatcapMaterial()
+  matCapMaterial.matcap = matCapTexture
+
+  //?meshDepthMaterial
+  const depthMaterial = new THREE.MeshDepthMaterial();
+
+  //?MeshLamberMaterial
+  //needs lights to work
+  const lamberMaterial = new THREE.MeshLambertMaterial()
+
+  //?MeshPhongMaterial
+  //needs lights to work
+  const phongMaterial = new THREE.MeshPhongMaterial();
+  phongMaterial.shininess = 100
+  phongMaterial.specular = new THREE.Color(0x0000ff);
+
+  //?CartonMaterial
+  const cartoonMaterial = new THREE.MeshToonMaterial();
+  
+  
+  
+
+//Sphere
+ const sphere = new THREE.Mesh(
+  new THREE.SphereBufferGeometry(0.5,16,16),
+  matCapMaterial
+ );
+
+ //plane
+ const plane = new THREE.Mesh(
+  new THREE.PlaneBufferGeometry(1,1),
+  material
+
+ );
+
+ plane.position.x = 1.3;
+
+ //Torus
+ const torus = new THREE.Mesh(
+  new  THREE.TorusBufferGeometry(0.3,0.2,16,12),
+    cartoonMaterial
+ );
+
+ torus.position.x = -1.3;
+
+
+ //Adding meshes to the scene
+ scene.add(sphere,plane,torus);
+
+ //Lights
+  const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
+  
+  const pontLight = new THREE.PointLight(0xffffff,0.5);
+  pontLight.getWorldPosition.x = 2;
+
+  scene.add(ambientLight,pontLight);
+  
+//camera 
+const camera = new THREE.PerspectiveCamera(75, sizes.with / sizes.height, 0.1,100);
+camera.position.x = 2;
+camera.position.y = 3;
+camera.position.z = 4;
 
 
 
-//perspective Camera
-const camera = new THREE.PerspectiveCamera(
-  71,
-  sizes.width / sizes.height,
-  0.1,
-  100
-);
+//canvas
+const canvas =document.querySelector('canvas.webGL');
 
-
-scene.add(camera);
-
-//Setting camera position
-// camera.position.x = 3; //same as blender(horizontal)
-// camera.position.y = 3; //it would be z in blender(vertical)
-camera.position.z = 3; //it would be y in blender(depth)
-
-// Set camera to focus on mesh
-// camera.lookAt(mesh.position)
-
-//rendering mesh
-const canvas = document.querySelector(".webGL");
+//Rendering the scene
 const renderer = new THREE.WebGLRenderer({
   canvas: canvas,
 });
+renderer.setSize(sizes.with, sizes.height);
+
+// ? if i don't have a canvas element in the html
+// const renderer = new THREE.WebGLRenderer();
+// const rendererElement = renderer.domElement;
+// document.body.appendChild(rendererElement);
+// const controls = new OrbitControls( camera, renderer.domElement );
+
 
 //Controls
-const controls = new OrbitControls(camera, canvas);
+const controls = new OrbitControls( camera, canvas );
+
+//settings to smooth movement on pan
 controls.enableDamping = true;
-// controls.update()
-// controls.target.y = 1;
+controls.dampingFactor =  0.05;
 
-renderer.setSize(sizes.width, sizes.height);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+camera.position.set( 0, 0, 2 );
+controls.update();
 
-// let time = Date.now()
 
-//Clock
 const clock = new THREE.Clock();
 
-//Animations
-const tick = () => {
+function animate() {
 
-  //Clock
+  //same nome function as parameter
+  requestAnimationFrame( animate );
+	// required if controls.enableDamping or controls.autoRotate are set to true
+	controls.update();
+
   const elapsedTime = clock.getElapsedTime();
 
-  controls.update();
+  //animate meshes
+  plane.rotation.y = 0.1 * elapsedTime;
+  torus.rotation.y = 0.1 * elapsedTime;
+  sphere.rotation.y = 0.1 * elapsedTime;
 
-  renderer.render(scene, camera);
-  window.requestAnimationFrame(tick);
-};
-tick();
+  plane.rotation.x = 0.3 * elapsedTime;
+  torus.rotation.x = 0.3 * elapsedTime;
+  sphere.rotation.x = 0.3 * elapsedTime;
+  
+
+	renderer.render( scene, camera );
+
+}
+
+animate();
+
