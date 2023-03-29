@@ -12,7 +12,6 @@ const image = new Image()
 const texture = new THREE.Texture(image);
 
 image.onload = () => {
-    console.log('image loaded');
     //its important to aply image loaded
     texture.needsUpdate = true
 }
@@ -47,26 +46,13 @@ const nomarlTextureCube1 = textureLoader.load('/textures/door/normal.jpg');
 const ambientOclussionTextureCube1 = textureLoader.load('/textures/door/ambientOcclusion.jpg');
 const roughnessTextureCube1 = textureLoader.load('/textures/door/roughness.jpg')
 
-// colorTextureCube1.repeat.x = 2 
-// colorTextureCube1.repeat.y = 3
-// colorTextureCube1.wrapS = THREE.MirroredRepeatWrapping // wrapS horizontal
-// colorTextureCube1.wrapT = THREE.MirroredRepeatWrapping //wrapT Vertical
-
-// colorTextureCube1.offset.x = 0.5
-// colorTextureCube1.offset.y = 0.5
-// colorTextureCube1.rotation = Math.PI / 4
-// colorTextureCube1.center.x = 0.5
-// colorTextureCube1.center.y = 0.5
-
 colorTextureCube1.generateMipmaps = false
+
+//minFilter doens't need genereateMipMaps
 colorTextureCube1.minFilter = THREE.NearestFilter
+
+//to avoid blur textures
 colorTextureCube1.magFilter = THREE.NearestFilter
-
-
-
-
-
-
 
 //Debug iniziliazing
 const gui = new dat.GUI();
@@ -102,12 +88,13 @@ window.addEventListener("mousemove", (e) => {
 });
 
 const scene = new THREE.Scene();
+
 //Mesh
 const geometry = new THREE.BoxBufferGeometry(1, 1, 1, 2, 2, 2);
 // const geometry = new THREE.Geometry()
 
 const material = new THREE.MeshBasicMaterial({
-    color: parameters.color,
+  color: parameters.color,
   map: texture,
 });
 
@@ -194,24 +181,7 @@ window.addEventListener("resize", () => {
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 });
 
-// window.addEventListener("dblclick", () => {
-//   const fullscreenElement =
-//     document.fullscreenElement || document.webkitFullscreenElement;
 
-//   if (!fullscreenElement) {
-//     if (canvas.requestFullscreen) {
-//       canvas.requestFullscreen();
-//     } else if (canvas.webkitRequestFullscreen) {
-//       canvas.webkitRequestFullscreen();
-//     }
-//   } else {
-//     if (document.exitFullscreen) {
-//       document.exitFullscreen();
-//     } else if (document.webkitExitFullscreen) {
-//       document.webkitExitFullscreen();
-//     }
-//   }
-// });
 
 //perspective Camera
 const camera = new THREE.PerspectiveCamera(
@@ -221,10 +191,7 @@ const camera = new THREE.PerspectiveCamera(
   100
 );
 
-// Ortagraphic Camera
-// (left,rigth,top,bottom)
-// const aspectRatio = sizes.width / sizes.height;
-// const camera = new THREE.OrthographicCamera(-1 * aspectRatio, 1 * aspectRatio,1,-1,0.1,100)
+
 scene.add(camera);
 
 //Setting camera position
@@ -255,33 +222,12 @@ renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 //Clock
 const clock = new THREE.Clock();
 
-// gsap.to(mesh.position,{duration: 1, delay:1, x:2})
-// gsap.to(mesh.position,{duration: 1, delay:2, x:0})
-
 //Animations
 const tick = () => {
-  //Time
-  // const currentTime = Date.now();
-  // const deltaTime = currentTime - time;
-  // time = currentTime;
-
-  // Update objects by Time
-  // mesh.rotation.y += 0.001 * deltaTime
 
   //Clock
   const elapsedTime = clock.getElapsedTime();
-  //Update objects with clock class
-  // mesh.rotation.y = elapsedTime
-  // group.position.y = Math.sin(elapsedTime);
-  // mesh.position.x = Math.cos(elapsedTime)
 
-  //Update Camera
-  // camera.position.x = Math.sin(cursor.x * Math.PI * 2) * 5;
-  // camera.position.z = Math.cos(cursor.x * Math.PI * 2) * 5 ;
-  // camera.position.y = cursor.y * 10 ;
-  // camera.lookAt(mesh.position);
-
-  //Update Controls smmoth movemment with controls.enableDamping = true;
   controls.update();
 
   renderer.render(scene, camera);
